@@ -15,9 +15,9 @@ pub mod tasks {
         pub tasks: std::collections::HashMap<String, Task>,
     }
 
-    pub fn parse() -> Result<Tasks, serde_yaml::Error> {
+    pub fn parse(file_path: &String) -> Result<Tasks, serde_yaml::Error> {
         log::debug!("Parsing tasks from file");
-        let file = File::open("./tasks.yaml").expect("Unable to open file");
+        let file = File::open(file_path).expect("Unable to open file");
         return serde_yaml::from_reader(file);
     }
 
@@ -27,7 +27,7 @@ pub mod tasks {
 
     pub fn list(tasks: &Tasks) {
         for t in tasks.tasks.iter() {
-            print!("{1: <20}{}", &t.0, &t.1.description);
+            println!("{1: <20}{}", &t.0, &t.1.description);
         }
     }
 }

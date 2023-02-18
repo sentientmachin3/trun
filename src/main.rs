@@ -1,41 +1,58 @@
-use clap::Parser;
+use clap::{Arg, Command, ArgAction};
 use env_logger;
 use log;
 mod tasks;
 use tasks::tasks::{list, parse, run, Tasks};
 
-#[derive(Parser, Debug)]
-#[command(author="sentientmachin3", version, about="Simple tool to run tasks given a config yaml file", long_about = None)]
-struct Args {
-    /// Name of the task to run
-    #[arg(short, long)]
-    run: Option<String>,
-
-    /// List the available tasks
-    #[arg(short, long)]
-    list: Option<String>,
-}
-
 fn main() {
     env_logger::init();
-    let args = Args::parse();
-    log::debug!("Parsed args {:?}", &args);
+    let command = build_cli_command();
+    let matches = command.get_matches();
 
-    let parsed_tasks: Result<tasks::tasks::Tasks, serde_yaml::Error> = parse();
+    let cli_config = matches.get_one("config").unwrap();
+    let parsed_tasks = parse(&cli_config);
     log::debug!("Parsed tasks: {:?}", &parsed_tasks);
+
     let tasks: Tasks = match parsed_tasks {
         Ok(t) => t,
         Err(e) => panic!("{}", e),
     };
 
-    if args.run.is_some() {
-        let task_name: String = args.run.unwrap();
+    let run_arg = matches.get_one::<String>("run");
+    if run_arg.is_some() {
+        let task_name = run_arg.unwrap().to_string();
         let task = &tasks.tasks[&task_name];
         let result = run(&task);
-        log::debug!("Ran command {} - exit status {}", &task_name, &result.unwrap())
+        log::debug!(
+            "Ran command {} - exit status {}",
+            &task_name,
+            &result.unwrap()
+        )
     }
 
-    if args.list.is_some() {
+    let list_arg = matches.get_one::<bool>("list");
+    if list_arg.is_some() {
         return list(&tasks);
     }
+}
+
+fn build_cli_command() -> Command {
+    return Command::new("trun")
+        .arg(
+            Arg::new("config")
+                .short('c')
+                .help("Set the config file path")
+                .default_value("./trun.yaml"),
+        )
+        .arg(
+            Arg::new("run")
+                .short('r')
+                .help("Run task in the trun.yaml file"),
+        )
+        .arg(
+            Arg::new("list")
+                .short('l')
+                .help("List available commands as provided in trun.yaml file")
+                .action(ArgAction::SetTrue)
+        );
 }
