@@ -1,0 +1,7 @@
+tasks:
+  compile:
+    description: "Compile task"
+    command: "cargo build"
+  run:
+    description: "Run task"
+    command: "cargo run"
