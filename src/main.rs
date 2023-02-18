@@ -1,4 +1,4 @@
-use clap::{Arg, Command, ArgAction};
+use clap::{Arg, ArgAction, Command};
 use env_logger;
 use log;
 mod tasks;
@@ -24,9 +24,9 @@ fn main() {
         let task = &tasks.tasks[&task_name];
         let result = run(&task);
         log::debug!(
-            "Ran command {} - exit status {}",
+            "Ran command {} - {}",
             &task_name,
-            &result.unwrap()
+            &result.unwrap().to_string()
         )
     }
 
@@ -53,6 +53,6 @@ fn build_cli_command() -> Command {
             Arg::new("list")
                 .short('l')
                 .help("List available commands as provided in trun.yaml file")
-                .action(ArgAction::SetTrue)
+                .action(ArgAction::SetTrue),
         );
 }
