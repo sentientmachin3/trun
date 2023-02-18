@@ -36,6 +36,6 @@ fn main() {
     }
 
     if args.list.is_some() {
-        return list();
+        return list(&tasks);
     }
 }

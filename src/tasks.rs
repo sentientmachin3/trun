@@ -6,7 +6,6 @@ pub mod tasks {
 
     #[derive(Debug, Deserialize)]
     pub struct Task {
-        name: String,
         description: String,
         command: String,
     }
@@ -23,9 +22,12 @@ pub mod tasks {
     }
 
     pub fn run(task: &Task) -> Result<ExitStatus, std::io::Error> {
-        log::info!("Running command {:?}", &task.name);
         return Command::new("sh").arg("-c").arg(&task.command).status();
     }
 
-    pub fn list() {}
+    pub fn list(tasks: &Tasks) {
+        for t in tasks.tasks.iter() {
+            print!("{1: <20}{}", &t.0, &t.1.description);
+        }
+    }
 }
