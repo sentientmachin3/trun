@@ -17,8 +17,15 @@ pub mod tasks {
 
     pub fn parse(file_path: &String) -> Result<Tasks, serde_yaml::Error> {
         log::debug!("Parsing tasks from file");
-        let file = File::open(file_path).expect("Unable to open file");
-        return serde_yaml::from_reader(file);
+        let file = File::open(file_path);
+        let content = match file {
+            Ok(c) => c,
+            Err(e) => {
+                log::error!("Unable to parse tasks: {}", e);
+                std::process::exit(1);
+            }
+        };
+        return serde_yaml::from_reader(content);
     }
 
     pub fn run(task: &Task) -> Result<ExitStatus, std::io::Error> {
